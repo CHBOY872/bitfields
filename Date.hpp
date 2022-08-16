@@ -1,7 +1,7 @@
 #ifndef DATE_HPP_SENTRY
 #define DATE_HPP_SENTRY
 
-struct DateStruct
+struct DateStruct // main structure
 {
     unsigned short nWeekDay : 3;
     unsigned short nMonthDay : 6;
@@ -9,7 +9,7 @@ struct DateStruct
     unsigned short nYear : 8;
 };
 class Date;
-class DateCursor
+class DateCursor // for getting bits from structure
 {
     Date *the_master;
     unsigned pos : 8;
@@ -17,12 +17,12 @@ class DateCursor
 public:
     DateCursor(Date *_the_master, unsigned _pos = 0)
         : the_master(_the_master), pos(_pos) {}
-    DateCursor &operator=(bool i);
-    DateCursor &operator~();
-    operator bool();
+    DateCursor &operator=(bool i); // overloading assignment (set 1, or 0)
+    DateCursor &operator~();       // overloading negation
+    operator bool();               // casting to bool
 };
 
-class Date
+class Date // main class
 {
     friend class DateCursor;
     DateStruct *date;
@@ -38,7 +38,9 @@ public:
         date->nYear = _nYear;
     }
     ~Date() { delete date; }
-
+    /*
+        set (1), reset(0), invert(from 1 to 0, from 0 to 1)
+    */
     void SetBitInWeekDay(unsigned int pos);
     void ResetBitInWeekDay(unsigned int pos);
     void InvertBitInWeekDay(unsigned int pos);
@@ -55,16 +57,19 @@ public:
     void ResetBitInYear(unsigned int pos);
     void InvertBitInYear(unsigned int pos);
 
+    // set own values in fields
     void SetnWeekDay(unsigned _nWeekDay) { date->nWeekDay = _nWeekDay; }
     void SetnMonthDay(unsigned _nMonthDay) { date->nMonthDay = _nMonthDay; }
     void SetnMonth(unsigned _nMonth) { date->nMonth = _nMonth; }
     void SetnYear(unsigned _nYear) { date->nYear = _nYear; }
 
+    // get fields
     unsigned short GetnWeekDay() { return date->nWeekDay; }
     unsigned short GetnMonthDay() { return date->nMonthDay; }
     unsigned short GetnMonth() { return date->nMonth; }
     unsigned short GetnYear() { return date->nYear; }
 
+    // get bit from structure
     DateCursor operator[](unsigned int idx)
     {
         return DateCursor(this, idx);

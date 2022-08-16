@@ -17,6 +17,7 @@ class DateClassCursor
 public:
     DateClassCursor(DateClass *_the_master, unsigned _pos = 0)
         : the_master(_the_master), pos(_pos) {}
+    DateClassCursor &operator=(bool i);
     operator bool();
 };
 
@@ -35,7 +36,6 @@ public:
         date->nMonth = _nMonth;
         date->nYear = _nYear;
     }
-    ~DateClass() { delete date; }
 
     void SetnWeekDay(unsigned _nWeekDay) { date->nWeekDay = _nWeekDay; }
     void SetnMonthDay(unsigned _nMonthDay) { date->nMonthDay = _nMonthDay; }
@@ -55,18 +55,36 @@ public:
 
 DateClassCursor::operator bool()
 {
-    int *temp = (int *)the_master->date;
-    bool res = *temp >> pos;
-    return res & 1;
+    unsigned int *ptr = (unsigned int *)the_master->date;
+    unsigned int bit = *ptr >> pos;
+    return bit & 1;
+}
+
+DateClassCursor &DateClassCursor::operator=(bool i)
+{
+    unsigned int *ptr = (unsigned int *)the_master->date;
+    unsigned int mask = i << pos;
+    if (!i)
+    {
+        mask = !mask;
+        *ptr &= mask;
+    }
+    else
+        *ptr |= mask;
+    return *this;
 }
 
 int main()
 {
-    DateClass z(7, 9, 10, 2);
+    DateClass str(0, 0, 0, 0);
+    unsigned int *ptr = (unsigned int *)&str;
     for (int i = 0; i < 32; i++)
     {
-        printf("%d\n", (bool)z[i]);
+        str[i] = 1;
+        printf("%d\n", (bool)str[i]);
     }
-
+    str.SetnMonthDay(0);
+    printf("%d %d %d %d\n", str.GetnMonth(), str.GetnMonthDay(),
+           str.GetnWeekDay(), str.GetnYear());
     return 0;
 }
